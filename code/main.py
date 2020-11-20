@@ -2,7 +2,9 @@ import sys
 import pygame
 import random
 import numpy as np
-from driverModel import Driver, ModelParams
+from random import randint, uniform, random
+
+
 pygame.init()
 
 BLACK = (0, 0, 0)
@@ -13,6 +15,7 @@ SIZE = WIDTH, HEIGHT = 1000, 100
 SCREEN = pygame.display.set_mode(SIZE)
 
 CLOCK = pygame.time.Clock()
+
 
 class Car(pygame.sprite.Sprite):
     """Car game object
@@ -79,20 +82,21 @@ class Car(pygame.sprite.Sprite):
         for car in self.road.carlist:
             if car.pos[0] > self.pos[0] and car.pos[1] == self.pos[1]:
                 carFrontNow = car if (carFrontNow is None or car.pos[0] < carFrontNow.pos[0]) else carFrontNow
-            if (self.pos[1] is not road.bottomlane and car.pos[0] > self.pos[0] and car.pos[1] == self.pos[1] + self.road.lanewidth):
+            if self.pos[1] is not road.bottomlane and car.pos[0] > self.pos[0] and car.pos[1] == self.pos[1] + self.road.lanewidth:
                 # Front right
-                carFrontRight = car if (carFrontRight is None or car.pos[0] < carFrontRight.pos[0]) else carFrontRight
+                carFrontRight = car if carFrontRight is None or car.pos[0] < carFrontRight.pos[0] else carFrontRight
                 pass
-            if (self.pos[1] is not road.bottomlane and car.pos[0] < self.pos[0] and car.pos[1] == self.pos[1] + self.road.lanewidth):
+            if self.pos[1] is not road.bottomlane and car.pos[0] < self.pos[0] and car.pos[1] == self.pos[1] + self.road.lanewidth:
                 # Back right
                 carBackRight = car if (carBackRight is None or car.pos[0] > carBackRight.pos[0]) else carBackRight
-            if (self.pos[1] is not road.toplane and car.pos[0] > self.pos[0] and car.pos[1] == self.pos[1] - self.road.lanewidth):
+            if self.pos[1] is not road.toplane and car.pos[0] > self.pos[0] and car.pos[1] == self.pos[1] - self.road.lanewidth:
                 # Front left
                 carFrontLeft = car if (carFrontLeft is None or car.pos[0] < carFrontLeft.pos[0]) else carFrontLeft
-            if (self.pos[1] is not road.toplane and car.pos[0] < self.pos[0] and car.pos[1] == self.pos[1] - self.road.lanewidth):
+            if self.pos[1] is not road.toplane and car.pos[0] < self.pos[0] and car.pos[1] == self.pos[1] - self.road.lanewidth:
                 # Back left
-                carBackLeft = car if (carBackLeft is None or car.pos[0] > carBackLeft.pos[0]) else carBackLeft
-            else: continue
+                carBackLeft = car if carBackLeft is None or car.pos[0] > carBackLeft.pos[0] else carBackLeft
+            else:
+                continue
 
         return {"frontNow": carFrontNow, "frontLeft": carFrontLeft, "frontRight": carFrontRight, "backLeft": carBackLeft, "backRight": carBackRight}
 
@@ -132,6 +136,7 @@ class Car(pygame.sprite.Sprite):
         self.__v += self.driver.getAccel(v=self.v, other_v=other_v, s=s) / FPS
         self.__v = max(self.__v, 0)
 
+
     def updateGlobal(self):
         """
         Update global state
@@ -149,8 +154,8 @@ class Car(pygame.sprite.Sprite):
         Draw onto the screen
         """
 
-
         return self.road.screen.blit(self.surface, self.rect)
+
 
 class Road:
     """Road object to keep track of all the cars, create and destroy them when they are outside the screen
@@ -195,7 +200,7 @@ class Road:
             lane = random.choice(range(self.lanes)) * self.lanewidth
             v = np.random.normal(self.avg_speed, self.speed_sigma)
 
-            params = ModelParams(v_0=v, s_0=2, s_1=0, T=1.6, a=2, b=1.67, delta=4, length=5, thr=0.4, pol=0.5)
+            params = ModelParams(v_0=v, s_0=randint(1, 4), s_1=randint(0, 1), T=uniform(1, 2), a=randint(1, 4), b=uniform(1, 2), delta=randint(1, 10), length=randint(3, 8), thr=random(), pol=random())
             newCar = Car(modelParams=params, road=self, startpos=[self.position[0], self.position[1] + lane], start_v=v)
             self.carlist.append(newCar)
 
@@ -209,8 +214,10 @@ class Road:
                 #del car
             else: car.draw()
 
+
 def dist(a, b):
     return np.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+
 
 if __name__ == "__main__":
     road = Road(SCREEN, (0, HEIGHT/2), lanewidth=5, frequency=1, lanes=3, avg_speed=30, speed_sigma=1)

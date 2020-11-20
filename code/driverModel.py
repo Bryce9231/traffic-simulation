@@ -1,5 +1,6 @@
 import math
 
+
 class ModelParams:
     """Class to store the IDM parameters
 
@@ -7,7 +8,7 @@ class ModelParams:
         v_0: Desired velocity
         T: Safe time headway
         a: Maximum acceleration
-        b: Desierd acceleration
+        b: Desired acceleration
         delta: Acceleration exponent
         s_0: Jam distance
         s_1: Jam Distance
@@ -27,6 +28,7 @@ class ModelParams:
         self.length = length
         self.thr = thr
         self.pol = pol
+
 
 class Driver:
     """Driver Class to following the Intelligent Driver Model
